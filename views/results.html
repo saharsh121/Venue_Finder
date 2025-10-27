@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Search Results | Venue Availability Tracker</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    /* Optional: add some margin to container */
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      position: relative;
+      z-index: 1; /* on top of canvas */
+    }
+
+    /* Canvas for constellation animation */
+    #constellation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0; /* behind the content */
+    }
+  </style>
+</head>
+<body>
+  <canvas id="constellation"></canvas>
+
+  <div class="container">
+    <h1>Search Results</h1>
+
+    <div id="filters-used">
+      <h3>Filters Used:</h3>
+      <ul id="filters-list"></ul>
+    </div>
+
+    <hr>
+
+    <div id="results">
+      <h3>Loading results...</h3>
+    </div>
+
+    <br>
+    <a href="/student-home">🔍 New Search</a>
+    <br><br>
+    <a href="/">🏠 Home</a>
+  </div>
+
+  <script>
+    // Function to get URL query parameters as an object
+    function getQueryParams() {
+      const params = {};
+      location.search.substring(1).split("&").forEach(pair => {
+        if (pair) {
+          const [key, value] = pair.split("=");
+          params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+        }
+      });
+      return params;
+    }
+
+    // Render filters used
+    function renderFilters(filters) {
+      const ul = document.getElementById('filters-list');
+      ul.innerHTML = '';
+      if (!filters.day) {
+        ul.innerHTML = '<li>No filters selected</li>';
+        return;
+      }
+      // Always show Day
+      ul.innerHTML += `<li>Day: ${filters.day}</li>`;
+      if (filters.building) ul.innerHTML += `<li>Building: ${filters.building}</li>`;
+      if (filters.floor) ul.innerHTML += `<li>Floor: ${filters.floor}</li>`;
+      if (filters.time_slot) ul.innerHTML += `<li>Time Slot: ${filters.time_slot}</li>`;
+    }
+
+    // Render results table
+    function renderResults(rooms) {
+      const resultsDiv = document.getElementById('results');
+      if (rooms.length === 0) {
+        resultsDiv.innerHTML = '<p>No vacant rooms found for the selected criteria.</p>';
+        return;
+      }
+
+      let tableHTML = `
+        <h3>Vacant Rooms:</h3>
+        <table border="1" cellpadding="10" cellspacing="0">
+          <tr>
+            <th>Room No</th>
+            <th>Building</th>
+            <th>Floor</th>
+            <th>Time Slot</th>
+          </tr>
+      `;
+
+      rooms.forEach(room => {
+        tableHTML += `
+          <tr>
+            <td>${room.room_no}</td>
+            <td>${room.building}</td>
+            <td>${room.floor}</td>
+            <td>${room.time_slot}</td>
+          </tr>
+        `;
+      });
+
+      tableHTML += '</table>';
+      resultsDiv.innerHTML = tableHTML;
+    }
+
+    // Fetch results from backend API
+    async function fetchResults() {
+      const params = getQueryParams();
+
+      if (!params.day) {
+        document.getElementById('results').innerHTML = '<p style="color:red;">Day is required in the URL query parameters.</p>';
+        return;
+      }
+
+      try {
+        const queryStr = new URLSearchParams(params).toString();
+        const response = await fetch('/check-availability?' + queryStr);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          document.getElementById('results').innerHTML = `<p style="color:red;">Error: ${errorData.error || 'Server error'}</p>`;
+          return;
+        }
+
+        const data = await response.json();
+        renderFilters(data.filters);
+        renderResults(data.rooms);
+      } catch (error) {
+        document.getElementById('results').innerHTML = `<p style="color:red;">Error fetching results.</p>`;
+        console.error(error);
+      }
+    }
+
+    // Run on page load
+    fetchResults();
+
+    // Constellation animation
+    const canvas = document.getElementById('constellation');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const stars = [];
+    const numStars = 120;
+
+    class Star {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radius = Math.random() * 2;
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+        this.draw();
+      }
+    }
+
+    for (let i = 0; i < numStars; i++) {
+      stars.push(new Star());
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = stars[i].x - stars[j].x;
+          const dy = stars[i].y - stars[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255,255,255,' + (1 - dist / 120) + ')';
+            ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      stars.forEach(star => star.update());
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>

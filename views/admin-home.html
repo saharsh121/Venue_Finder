@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Home | Venue Availability Tracker</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    body { color: black; font-family: 'Segoe UI', sans-serif; }
+
+    /* Toggle Button */
+    .toggle-btn {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #764ba2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      position: sticky; /* keeps button visible */
+      top: 20px;
+      z-index: 10;
+    }
+    .toggle-btn:hover {
+      background-color: #5b3b85;
+    }
+
+    /* Feedback section */
+    .feedback-section {
+      display: none;
+      margin-top: 20px;
+      background-color: rgba(0, 0, 0, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .feedback-table-wrapper {
+      max-height: 250px; /* fixed height */
+      overflow-y: auto;  /* scrollable */
+    }
+
+    /* Scrollbar styling */
+    .feedback-table-wrapper::-webkit-scrollbar {
+      width: 8px;
+    }
+    .feedback-table-wrapper::-webkit-scrollbar-thumb {
+      background-color: rgba(100, 75, 162, 0.7);
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 10px; text-align: left; }
+
+    .event-management {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .event-section, .event-filter {
+      flex: 1;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+      min-width: 300px;
+    }
+
+    .event-section h2, .event-filter h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .event-section input,
+    .event-section select,
+    .event-filter select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+    }
+
+    .btn {
+      background: #28a745;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #1e7e34;
+    }
+
+    p.note { font-size: 0.9rem; color: #555; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <br><br>
+    <h1>Welcome, Admin</h1>
+    <a href="/" style="text-decoration:none; color:#764ba2; font-weight:bold;">Logout</a>
+
+    <!-- Toggle Feedback Button -->
+    <button class="toggle-btn" onclick="toggleFeedback()">View Student Feedback</button>
+
+    <!-- Feedback Section -->
+    <div class="feedback-section" id="feedbackSection">
+      <h2>Student Feedback</h2>
+      <div class="feedback-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Feedback</th>
+            </tr>
+          </thead>
+          <tbody id="feedbackTableBody">
+            <tr>
+              <td colspan="3">Loading feedback...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Event Booking & Filtering Section -->
+    <div class="event-management">
+      <!-- Event Booking Section -->
+      <div class="event-section">
+        <h2>Book Event Venue</h2>
+        <p class="note">Select booking type. Fill only the fields required for that type, then pick start & end time.</p>
+        <form onsubmit="bookEvent(event)">
+          <label>Event Name:</label>
+          <input type="text" id="event_name" placeholder="Enter event name" required />
+
+          <label>Booking Type:</label>
+          <select id="booking_type" onchange="toggleFields()" required>
+            <option value="">--Select--</option>
+            <option value="building">Entire Building</option>
+            <option value="floor">Entire Floor</option>
+            <option value="room">Single Room</option>
+            <option value="day">Entire Day (All Rooms)</option>
+          </select>
+
+          <label>Building:</label>
+          <select id="buildingEvent">
+            <option value="">--Select Building--</option>
+            <option value="SMV">SMV</option>
+            <option value="SJT">SJT</option>
+            <option value="TT">TT</option>
+            <option value="PRP">PRP</option>
+            <option value="MGB">MGB</option>
+            <option value="MGR">MGR</option>
+            <option value="GDN">GDN</option>
+          </select>
+
+          <div id="floor_field" style="display:none;">
+            <label>Floor Number:</label>
+            <input type="number" id="floor_num" min="0" max="10" placeholder="Enter floor number" />
+          </div>
+
+          <div id="room_field" style="display:none;">
+            <label>Room ID:</label>
+            <input type="text" id="room_id" placeholder="Enter room ID" />
+          </div>
+
+          <label>Start Date & Time:</label>
+          <input type="datetime-local" id="start_time" required />
+
+          <label>End Date & Time:</label>
+          <input type="datetime-local" id="end_time" required />
+
+          <button type="submit" class="btn">Book Event</button>
+        </form>
+      </div>
+
+      <!-- Event Filter Section -->
+      <div class="event-filter">
+        <h2>Filter Events Venue</h2>
+        <form onsubmit="filterEvents(event)">
+          <label>Status:</label>
+          <select id="event_status">
+            <option value="">All</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+
+          <label>Booking Type:</label>
+          <select id="event_type">
+            <option value="">All</option>
+            <option value="building">Building</option>
+            <option value="floor">Floor</option>
+            <option value="room">Room</option>
+            <option value="day">Day</option>
+          </select>
+
+          <button type="submit" class="btn">Apply Filter</button>
+        </form>
+
+        <div id="eventResults">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Building</th>
+                <th>Floor</th>
+                <th>Room</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody">
+              <tr><td colspan="8" style="text-align:center;">No events loaded yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let feedbackVisible = false;
+
+    function toggleFeedback() {
+      const section = document.getElementById('feedbackSection');
+      const btn = document.querySelector('.toggle-btn');
+      feedbackVisible = !feedbackVisible;
+      section.style.display = feedbackVisible ? 'block' : 'none';
+      btn.textContent = feedbackVisible ? 'Hide Student Feedback' : 'View Student Feedback';
+      if (feedbackVisible) loadFeedback();
+    }
+
+    function loadFeedback() {
+      fetch('/get-feedback')
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('feedbackTableBody');
+          tbody.innerHTML = '';
+          if (!data.length) tbody.innerHTML = '<tr><td colspan="3">No feedback yet.</td></tr>';
+          else data.forEach(item => {
+            tbody.innerHTML += `<tr>
+              <td>${item.name}</td>
+              <td>${item.email}</td>
+              <td>${item.message}</td>
+            </tr>`;
+          });
+        })
+        .catch(err => {
+          document.getElementById('feedbackTableBody').innerHTML =
+            '<tr><td colspan="3">Error loading feedback.</td></tr>';
+        });
+    }
+
+    function toggleFields() {
+      const type = document.getElementById("booking_type").value;
+      document.getElementById("floor_field").style.display = (type === "floor" || type === "room") ? "block" : "none";
+      document.getElementById("room_field").style.display = (type === "room") ? "block" : "none";
+    }
+
+    async function bookEvent(e) {
+      e.preventDefault();
+      const data = {
+        event_name: document.getElementById("event_name").value,
+        booking_type: document.getElementById("booking_type").value,
+        building: document.getElementById("buildingEvent").value,
+        floor: document.getElementById("floor_num").value,
+        room_id: document.getElementById("room_id").value,
+        start_time: document.getElementById("start_time").value,
+        end_time: document.getElementById("end_time").value
+      };
+      const res = await fetch("/book-event", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message || "Booking done");
+    }
+
+    function filterEvents(e) {
+      e.preventDefault();
+      const status = document.getElementById("event_status").value;
+      const bookingType = document.getElementById("event_type").value;
+      let url = "/admin-events?";
+      if (status) url += `status=${status}&`;
+      if (bookingType) url += `booking_type=${bookingType}`;
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) renderEventsTable(data.events);
+          else alert("Failed to fetch events");
+        })
+        .catch(err => console.error("Fetch error:", err));
+    }
+
+    function renderEventsTable(events) {
+      const tbody = document.getElementById("eventsTableBody");
+      tbody.innerHTML = "";
+      if (!events.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No events found</td></tr>`;
+        return;
+      }
+      events.forEach(ev => {
+        let building="-", floor="-", room="-";
+        if(ev.booking_type==="building") building=ev.building;
+        else if(ev.booking_type==="floor") { building=ev.building; floor=ev.floor; }
+        else if(ev.booking_type==="room") { building=ev.building; floor=ev.floor; room=ev.room_id; }
+        else if(ev.booking_type==="day") { building="All Buildings"; floor="All Floors"; room="All Rooms"; }
+        tbody.innerHTML += `<tr>
+          <td>${ev.event_id}</td>
+          <td>${ev.booking_type}</td>
+          <td>${building}</td>
+          <td>${floor}</td>
+          <td>${room}</td>
+          <td>${new Date(ev.start_time).toLocaleString()}</td>
+          <td>${new Date(ev.end_time).toLocaleString()}</td>
+          <td>${ev.status}</td>
+        </tr>`;
+      });
+    }
+  </script>
+</body>
+</html>

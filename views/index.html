@@ -1,0 +1,292 @@
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome | Venue Finder at VIT</title>
+  <style>
+    /* Particle background container */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      z-index: -1; /* keep it behind everything */
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      background-color: rgba(0, 0, 0, 0.3);
+      padding: 40px 60px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: 0.3s ease;
+      margin: auto;
+      z-index: 1;
+      position: relative;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.2em;
+      letter-spacing: 1px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 15px 30px;
+      margin: 10px;
+      background-color: #fff;
+      color: #764ba2;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background-color: #eee;
+      transform: scale(1.05);
+    }
+
+    #about-section {
+      display: none;
+      margin-top: 25px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      animation: fadeIn 0.35s ease-in-out;
+    }
+
+    .creators {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .creator-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 200px;
+    }
+
+    .creator-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      object-fit: cover;
+      margin-bottom: 8px;
+    }
+
+    .creator-card .name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .creator-card .role {
+      opacity: 0.95;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      text-align: center;
+      z-index: 1;
+      position: relative;
+    }
+
+    footer h3 {
+      margin-bottom: 15px;
+      font-size: 1.5em;
+    }
+
+    .contact-info {
+      margin-bottom: 15px;
+    }
+
+    .contact-info a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 1.1em;
+    }
+
+    .contact-info a:hover {
+      text-decoration: underline;
+    }
+
+    .feedback-form {
+      max-width: 400px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .feedback-form input,
+    .feedback-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: none;
+      font-size: 1em;
+    }
+
+    .feedback-form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #fff;
+      color: #764ba2;
+      font-size: 1.1em;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .feedback-form button:hover {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <!-- Constellation background -->
+  <div id="particles-js"></div>
+
+  <div class="container">
+    <h1>Welcome to Venue Finder at VIT</h1>
+    <p>Select your role to continue:</p>
+    <br>
+    <a href="/student" class="btn">I'm a Student</a>
+    <a href="/admin" class="btn">I'm an Admin</a>
+    <br>
+    <p>
+      The <b>Venue Finder at VIT</b> helps students and faculty quickly locate available classrooms and venues.  
+      It provides <b>real-time availability</b>, simplifies <b>event bookings</b>, and improves resource utilization.  
+      Our goal is to save time and make venue management efficient.
+    </p>
+
+    <button class="btn" id="aboutToggleBtn">About the Creators</button>
+
+    <div id="about-section">
+      <h2>About the Creators</h2>
+      <div class="creators">
+        <div class="creator-card">
+          <img src="shubham.jpg" alt="Creator 1">
+          <div class="name">Creator 1</div>
+          <div class="role">Frontend Developer</div>
+        </div>
+        <div class="creator-card">
+          <img src="saharsh.jpg" alt="Creator 2">
+          <div class="name">Creator 2</div>
+          <div class="role">Backend Developer</div>
+        </div>
+      </div>
+      <p>
+        This project combines a clean UI, quick venue search, and real-time updates.
+        <strong>Creator 1</strong> handled <b>frontend & UI/UX</b>;  
+        <strong>Creator 2</strong> built the <b>backend & database logic</b>.
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    <h3>Contact Us</h3>
+    <div class="contact-info">
+      <a href="tel:+911234567890">📞 Call: +91 8810724495</a>
+      <a href="mailto:support@venuefinder.com">✉ Email: support@venuefinder.com</a>
+    </div>
+
+    <div class="feedback-form">
+      <h4>Send Feedback or Ask Doubts</h4>
+      <form action="/submit-feedback" method="POST">
+        <input type="text" name="name" placeholder="Your Name" required>
+        <input type="email" name="email" placeholder="Your Email" required>
+        <textarea name="message" rows="4" placeholder="Your Feedback / Doubts" required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </footer>
+
+  <!-- Toggle creators section -->
+  <script>
+    document.getElementById('aboutToggleBtn').addEventListener('click', function () {
+      const section = document.getElementById('about-section');
+      const isHidden = section.style.display === 'none' || section.style.display === '';
+      section.style.display = isHidden ? 'block' : 'none';
+      this.textContent = isHidden ? 'Hide Creators' : 'About the Creators';
+    });
+  </script>
+
+  <!-- Particles.js script -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      "particles": {
+        "number": { "value": 70 },
+        "color": { "value": "#ffffff" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.6 },
+        "size": { "value": 3 },
+        "line_linked": {
+          "enable": true,
+          "distance": 150,
+          "color": "#ffffff",
+          "opacity": 0.3,
+          "width": 1
+        },
+        "move": { "enable": true, "speed": 2 }
+      },
+      "interactivity": {
+        "events": {
+          "onhover": { "enable": true, "mode": "grab" },
+          "onclick": { "enable": true, "mode": "push" }
+        },
+        "modes": {
+          "grab": { "distance": 140, "line_linked": { "opacity": 0.5 } },
+          "push": { "particles_nb": 4 }
+        }
+      },
+      "retina_detect": true
+    });
+  </script>
+</body>
+</html>
