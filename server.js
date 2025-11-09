@@ -7,7 +7,7 @@ const cron = require("node-cron");
 const app = express();
 const PORT = 8080;
 
-// ✅ MySQL CONNECTION
+//MySQL CONNECTION
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -18,14 +18,14 @@ const db = mysql.createConnection({
 
 db.connect(err => {
   if (err) throw err;
-  console.log("✅ Connected to MySQL database.");
+  console.log("Connected to MySQL database.");
 });
 
-// ✅ CRON JOB: Update event status & venue occupancy every minute
+//CRON JOB: Update event status & venue occupancy every minute
 cron.schedule("* * * * *", () => {
     const now = new Date();
 
-    // 1️⃣ Update event statuses
+    // Update event statuses
     db.query(
         "UPDATE events SET status='active' WHERE start_time <= ? AND end_time >= ? AND status='upcoming'",
         [now, now],
@@ -37,7 +37,7 @@ cron.schedule("* * * * *", () => {
         (err) => { if (err) console.error("Error completing events:", err); }
     );
 
-    // 2️⃣ Update venue availability based on active events
+    // Update venue availability based on active events
     db.query("SELECT * FROM events WHERE status='active'", (err, activeEvents) => {
         if (err) return console.error("Error fetching active events:", err);
 
@@ -64,14 +64,14 @@ cron.schedule("* * * * *", () => {
     });
 });
 
-// ✅ MIDDLEWARE
+// MIDDLEWARE
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// ✅ ROUTES FOR PAGES
+// ROUTES FOR PAGES
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
 app.get('/student', (req, res) => res.sendFile(path.join(__dirname, 'views', 'student.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
@@ -79,7 +79,7 @@ app.get('/results', (req, res) => res.sendFile(path.join(__dirname, 'views', 're
 app.get('/student-home', (req, res) => res.sendFile(path.join(__dirname, 'views', 'student-home.html')));
 app.get('/admin-home', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin-home.html')));
 
-// ✅ LOGIN ROUTES
+// LOGIN ROUTES
 app.post('/student-login', (req, res) => {
   const { username, password } = req.body;
   const query = "SELECT * FROM students WHERE username=? AND password=?";
@@ -100,7 +100,7 @@ app.post('/admin-login', (req, res) => {
   });
 });
 
-// ✅ STUDENT CHECK AVAILABILITY
+// STUDENT CHECK AVAILABILITY
 app.get('/check-availability', (req, res) => {
   const { day, building, floor, time_slot } = req.query;
 
@@ -122,7 +122,7 @@ app.get('/check-availability', (req, res) => {
   });
 });
 
-// ✅ FEEDBACK ROUTES
+//  FEEDBACK ROUTES
 app.post('/submit-feedback', (req,res)=>{
   const { name,email,message } = req.body;
   const sql = "INSERT INTO feedback (name,email,message) VALUES (?,?,?)";
@@ -140,7 +140,7 @@ app.get('/get-feedback',(req,res)=>{
   });
 });
 
-// ✅ EVENT BOOKING
+// EVENT BOOKING
 app.post('/book-event', (req,res)=>{
   const { event_name, booking_type, building, floor, room_id, start_time, end_time } = req.body;
 
@@ -163,8 +163,8 @@ app.post('/book-event', (req,res)=>{
   });
 });
 
-// ✅ FILTER EVENTS
-// ✅ FILTER EVENTS (Final Fix)
+// FILTER EVENTS
+// FILTER EVENTS (Final Fix)
 app.get('/admin-events', (req, res) => {
   const { status, booking_type } = req.query;
 
@@ -201,7 +201,7 @@ app.get('/admin-events', (req, res) => {
       }
     });
 
-    // ✅ Apply status filter AFTER recalculation
+    // Apply status filter AFTER recalculation
     let filtered = results;
     if (status) {
       filtered = filtered.filter(ev => ev.status === status);
@@ -212,7 +212,7 @@ app.get('/admin-events', (req, res) => {
 });
 
 
-// ✅ START SERVER
+// START SERVER
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
